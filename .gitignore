@@ -1,0 +1,5 @@
+/.A-*/*
+/build/*
+/.cache/*
+/.direnv/*
+/.vscode/*
