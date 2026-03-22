@@ -2,6 +2,8 @@
 
 This is a project I coded back in 2023. I haven't really modified the code, only edit some things to make the code work with the latest version of SDL3. For example, in older versions every SDL function used to return zero on success and non-zero on error, but now it returns true on success and false on error. Also added nix dev shell and direnv. Also added SANITIZE_ADDRESS option.
 
+This is a simple "always on top" digital clock made in SDL3.
+
 ## Requirements
 - cmake
 - SDL3 (version 3.4.0 was tested)
