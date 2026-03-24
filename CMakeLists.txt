@@ -20,7 +20,7 @@ file(GLOB srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c*")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/hdr)
 
-add_executable(${PROJECT_NAME} ${srcs} ${hdrs})
+add_executable(${PROJECT_NAME} ${srcs})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 

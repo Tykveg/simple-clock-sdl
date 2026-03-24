@@ -1,21 +1,31 @@
 #include "SimpleClock.hpp"
 #include <cstdlib>
 #include <stdexcept>
-#include <iostream>
 
 void TSimpleClock::SetTime()
 {
   std::time_t time_now = std::time(nullptr);
   time_changed = false;
+  char ctime_now[26];
+  char ctime_now_copy[26];
   if (time_now - time_prev >= time_difference)
   {
     time_changed = true;
     // Www Mmm dd hh:mm:ss yyyy\n
-    char* ctime_now = std::ctime(&time_now);
+    const char* ctime_res = std::ctime(&time_now);
+    std::copy(ctime_res, ctime_res + sizeof(ctime_now_copy), ctime_now_copy);
+    std::copy(ctime_res, ctime_res + sizeof(ctime_now), ctime_now);
     bool not_same_date = false;
     size_t i;
     pm = false;
-    if (ctime_now[11] == '1' && ctime_now[12] >= '2' || ctime_now[11] == '2')
+    if (ctime_now[11] == '1' && ctime_now[12] == '2') {
+      pm = true;
+    }
+    if (p.do_ampm && ctime_now[11] == '0' && ctime_now[12] == '0') {
+      ctime_now[11] = '1';
+      ctime_now[12] = '2';
+    }
+    if (ctime_now[11] == '1' && ctime_now[12] > '2' || ctime_now[11] == '2')
     {
       if (p.do_ampm)
       {
@@ -33,22 +43,20 @@ void TSimpleClock::SetTime()
       nums[i].SetChar(ctime_now[i + 11]);
     if (time_now - date_prev >= 86400) // 24*3600
     {
-      if (pm && p.do_ampm)
-        ctime_now = std::ctime(&time_now); // because I modified ctime string
       for (i = 0; i < 11; i++)
       {
-        if (ctime_now[i] != date[i])
+        if (ctime_now_copy[i] != date[i])
         {
           not_same_date = true;
-          date[i] = ctime_now[i];
+          date[i] = ctime_now_copy[i];
         }
       }
       for (i = 20; i < 25; i++)
       {
-        if (ctime_now[i] != date[i-9])
+        if (ctime_now_copy[i] != date[i-9])
         {
           not_same_date = true;
-          date[i-9] = ctime_now[i];
+          date[i-9] = ctime_now_copy[i];
         }
       }
       if (not_same_date || pm_prev != pm)
@@ -60,7 +68,7 @@ void TSimpleClock::SetTime()
         pm_prev = pm;
       }
       //date_prev = time_now - time_now % 86400; // doesn't work because for whatever reason it shows not 00:00 on some OSes
-      date_prev = time_now - ((ctime_now[11] - '0') * 36000 + (ctime_now[12] - '0') * 3600 + (ctime_now[14] - '0') * 600 + (ctime_now[15] - '0') * 60);
+      date_prev = time_now - ((ctime_now_copy[11] - '0') * 36000 + (ctime_now_copy[12] - '0') * 3600 + (ctime_now_copy[14] - '0') * 600 + (ctime_now_copy[15] - '0') * 60);
     }
     time_prev = time_now - time_now % time_difference;
   }
@@ -128,7 +136,7 @@ void TSimpleClock::CreateIcon(void)
     i-=sz;
   }
 
-  // SDL_Surface* icon_surf = SDL_CreateSurfaceFrom(pixels, sz, sz, sz*sizeof(Uint16), SDL_PIXELFORMAT_RGBA4444);
+  // SDL_Surface* icon_surf = SDL_CreateSurfaceFrom(pixels, sz, sz, sz*sizeof(Uint16), SDL_PIXELFORMAT_RGBA4444); // API change
   SDL_Surface* icon_surf = SDL_CreateSurfaceFrom(sz, sz, SDL_PIXELFORMAT_RGBA4444, pixels, sz*sizeof(Uint16));
   if (icon_surf == nullptr)
   {
